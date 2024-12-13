@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Weather Forecast</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f9;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+        .container {
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+        input {
+            padding: 10px;
+            width: 70%;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+        }
+        button {
+            padding: 10px;
+            width: 100px;
+            margin-top: 10px;
+            background-color: #007bff;
+            border: none;
+            color: white;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        .forecast {
+            margin-top: 20px;
+        }
+        .forecast p {
+            margin: 5px 0;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>Weather Forecast</h1>
+    <input type="text" id="city" placeholder="Enter city name">
+    <button onclick="getWeather()">Get Forecast</button>
+    <div class="forecast" id="forecast-info"></div>
+</div>
+
+<script>
+    async function getWeather() {
+        const city = document.getElementById("city").value;
+        const apiKey = "API 3.0";  // Replace with your actual OpenWeatherMap API key
+        const apiUrl = `https://openweathermap.org/api/one-call-3`;
+
+        try {
+            const response = await fetch(apiUrl);
+            const data = await response.json();
+            console.log(data); // Log the response
+
+            if (data.cod !== "200") {
+                alert("City not found! Please try again.");
+                return;
+            }
+
+            displayForecast(data);
+        } catch (error) {
+            console.error("Error fetching weather data:", error);
+            alert("Failed to fetch weather data. Please try again.");
+        }
+    }
+
+    function displayForecast(data) {
+        const forecastContainer = document.getElementById("forecast-info");
+        forecastContainer.innerHTML = ""; // Clear previous forecast
+
+        const forecast = data.list.slice(0, 5); // Get the first 5 forecasts (for 5 days)
+
+        forecast.forEach(item => {
+            const date = new Date(item.dt * 1000).toLocaleDateString();
+            const temp = item.main.temp;
+            const description = item.weather[0].description;
+            const humidity = item.main.humidity;
+            const windSpeed = item.wind.speed;
+
+            forecastContainer.innerHTML += `
+                <div class="forecast-item">
+                    <p><strong>${date}</strong></p>
+                    <p>Temperature: ${temp}°C</p>
+                    <p>Condition: ${description}</p>
+                    <p>Humidity: ${humidity}%</p>
+                    <p>Wind Speed: ${windSpeed} m/s</p>
+                    <hr>
+                </div>
+            `;
+        });
+    }
+</script>
+
+</body>
+</html>
